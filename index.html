@@ -9,16 +9,16 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --primary: #54a0ff;
-            --dark: #2f3640;
-            --light: #f5f6fa;
-            --glass: rgba(255, 255, 255, 0.9);
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --bg: #f8f9fa;
+            --glass: rgba(255, 255, 255, 0.95);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; }
 
         body {
-            background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+            background: #e9ecef;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -27,16 +27,16 @@
 
         /* 上方橫幅 */
         header {
-            height: 70px;
+            height: 80px;
             background: white;
             display: flex;
             align-items: center;
             padding: 0 40px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             z-index: 100;
         }
 
-        header h1 { font-size: 1.4rem; color: var(--dark); letter-spacing: 1px; }
+        header h1 { font-size: 1.5rem; color: #2d3436; border-left: 6px solid var(--primary); padding-left: 15px; }
 
         .main-container { display: flex; flex: 1; overflow: hidden; }
 
@@ -44,117 +44,94 @@
         nav {
             width: 280px;
             background: var(--glass);
-            backdrop-filter: blur(10px);
             padding: 30px 20px;
-            border-right: 1px solid rgba(255,255,255,0.3);
+            border-right: 1px solid #ddd;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
         .nav-item {
             padding: 15px 20px;
-            border-radius: 15px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            color: #57606f;
+            transition: 0.3s;
+            color: #636e72;
             font-weight: 500;
-            background: rgba(255,255,255,0.5);
+            border: 1px solid transparent;
         }
 
-        .nav-item:hover {
-            background: white;
-            transform: translateX(8px);
-            color: var(--primary);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
+        .nav-item:hover { background: #f1f2f6; color: var(--primary); }
 
         .nav-item.active {
             background: var(--primary);
             color: white;
-            box-shadow: 0 10px 20px rgba(84, 160, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
         }
 
         /* 右側顯示區塊 */
-        main {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-            background: rgba(255,255,255,0.1);
-        }
+        main { flex: 1; padding: 40px; overflow-y: auto; background: white; }
 
         .content-card { display: none; max-width: 900px; margin: 0 auto; }
         .content-card.active { display: block; }
 
-        .glass-panel {
-            background: white;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-        }
-
-        /* 遊戲佔位符（封面圖風格） */
-        .game-placeholder {
+        /* 遊戲封面遮罩：這是防止「遊戲結束」出現的關鍵 */
+        .game-cover {
             width: 100%;
-            height: 450px;
-            background: #f1f2f6;
+            height: 500px;
+            background: linear-gradient(45deg, #2d3436, #636e72);
             border-radius: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border: 2px dashed #dcdde1;
+            color: white;
+            text-align: center;
             margin-top: 20px;
-            transition: 0.3s;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.5);
         }
 
-        .load-btn {
-            padding: 12px 30px;
+        .play-btn {
+            padding: 15px 40px;
             background: var(--primary);
             color: white;
             border: none;
             border-radius: 50px;
+            font-size: 1.1rem;
             cursor: pointer;
-            font-size: 1rem;
-            box-shadow: 0 5px 15px rgba(84, 160, 255, 0.4);
+            margin-top: 20px;
             transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        .load-btn:hover { transform: scale(1.05); background: #2e86de; }
+        .play-btn:hover { transform: scale(1.1); background: #5f27cd; }
 
-        iframe { width: 100%; height: 500px; border: none; border-radius: 20px; margin-top: 20px; }
+        iframe { width: 100%; height: 550px; border: none; border-radius: 20px; margin-top: 20px; display: none; }
 
-        .note-box {
-            background: #f0f7ff;
-            border-radius: 15px;
+        .info-box {
+            background: #f8f9fa;
+            border-left: 5px solid var(--secondary);
             padding: 20px;
             margin: 20px 0;
-            border-left: 6px solid var(--primary);
+            border-radius: 0 10px 10px 0;
             cursor: pointer;
         }
 
-        /* 入口動畫 */
-        #intro-overlay {
+        /* 啟動動畫遮罩 */
+        #welcome-mask {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--dark);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            background: #2d3436; color: white;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; transition: 0.8s;
         }
-
-        .fade-out { opacity: 0; pointer-events: none; transition: 1s; }
     </style>
 </head>
 <body>
 
-    <div id="intro-overlay">
-        <h2 data-aos="zoom-in">114-2 科技應用專題展覽</h2>
-        <p style="margin: 15px 0 30px; opacity: 0.8;">高筱涵 的學習歷程檔案</p>
-        <button class="load-btn" onclick="document.getElementById('intro-overlay').classList.add('fade-out')">開啟探索之旅</button>
+    <div id="welcome-mask">
+        <h2 data-aos="fade-up">高筱涵的科技應用專案</h2>
+        <button class="play-btn" onclick="document.getElementById('welcome-mask').style.opacity='0'; setTimeout(()=>document.getElementById('welcome-mask').style.display='none', 800)">點擊進入</button>
     </div>
 
     <header>
@@ -163,73 +140,71 @@
 
     <div class="main-container">
         <nav>
-            <div class="nav-item active" onclick="showSection('home')">🏠 專題首頁</div>
-            <div class="nav-item" onclick="showSection('game1')">🎮 俄羅斯方塊</div>
-            <div class="nav-item" onclick="showSection('game2')">🚀 射擊遊戲</div>
-            <div class="nav-item" onclick="showSection('3d')">🎨 3D作品：鑰匙圈</div>
-            <div class="nav-item" onclick="showSection('reflection')">📝 學習反思</div>
+            <div class="nav-item active" onclick="switchTab('home')">🏠 專案首頁</div>
+            <div class="nav-item" onclick="switchTab('game1')">🎮 俄羅斯方塊</div>
+            <div class="nav-item" onclick="switchTab('game2')">🚀 射擊遊戲</div>
+            <div class="nav-item" onclick="switchTab('3d')">🎨 3D作品：鑰匙圈</div>
+            <div class="nav-item" onclick="switchTab('reflection')">📝 學習反思</div>
         </nav>
 
         <main>
-            <div id="home" class="content-card active" data-aos="fade-right">
-                <div class="glass-panel">
-                    <h2 style="color:var(--primary); margin-bottom:15px;">歡迎來到我的數位空間</h2>
-                    <p>這份檔案紀錄了我從 3D 建模到網頁開發的點滴。透過 AI 與新興科技的輔助，我學會了如何將創意轉化為現實的互動網頁。</p>
-                </div>
+            <div id="home" class="content-card active" data-aos="fade-up">
+                <h2 style="margin-bottom:20px;">作品集簡介</h2>
+                <p>歡迎來到我的學習歷程。在這裡，我展示了如何利用 AI 工具協助編寫網頁程式，以及 3D 建模的實際操作。請點擊左側選單查看細節。</p>
             </div>
 
             <div id="game1" class="content-card">
-                <div class="glass-panel">
-                    <h2>網頁遊戲：俄羅斯方塊</h2>
-                    <div class="note-box" onclick="showTip('心得', '這項作品是用AI Studio 完成的，我寫了很多關鍵字，希望能做出好玩的遊戲。')">
-                        💡 點擊閱讀：創作心得
-                    </div>
-                    <div id="wrapper-game1" class="game-placeholder">
-                        <p style="margin-bottom:15px; color:#7f8c8d;">點擊按鈕載入遊戲內容</p>
-                        <button class="load-btn" onclick="loadFrame('game1', 'https://y11252090-max.github.io/game/ai_studio_code.html')">載入作品網頁</button>
-                    </div>
+                <h2>俄羅斯方塊</h2>
+                <div class="info-box" onclick="pop('創作心得', '這項作品是用AI Studio 完成的，我寫了很多關鍵字，希望能做出好玩的遊戲。')">
+                    💡 點擊展開心得：希望能做出好玩的遊戲...
                 </div>
+                <div id="cover-game1" class="game-cover">
+                    <h3>俄羅斯方塊專案</h3>
+                    <p>網頁已準備就緒</p>
+                    <button class="play-btn" onclick="runGame('game1', 'https://y11252090-max.github.io/game/ai_studio_code.html')">啟動遊戲程式</button>
+                </div>
+                <iframe id="frame-game1"></iframe>
             </div>
 
             <div id="game2" class="content-card">
-                <div class="glass-panel">
-                    <h2>網頁遊戲：射擊遊戲</h2>
-                    <div class="note-box" onclick="showTip('心得', '這項作品是用AI Studio 完成的，我第一次做射擊遊戲，希望自己以後能提高我的功力。')">
-                        💡 點擊閱讀：創作心得
-                    </div>
-                    <div id="wrapper-game2" class="game-placeholder">
-                        <p style="margin-bottom:15px; color:#7f8c8d;">點擊按鈕載入遊戲內容</p>
-                        <button class="load-btn" onclick="loadFrame('game2', 'https://y11252090-max.github.io/game-2/ai_studio_code.html')">載入作品網頁</button>
-                    </div>
+                <h2>射擊遊戲</h2>
+                <div class="info-box" onclick="pop('創作心得', '這項作品是用AI Studio 完成的，我第一次做射擊遊戲，希望自己以後能提高我的功力。')">
+                    💡 點擊展開心得：第一次嘗試射擊類型...
                 </div>
+                <div id="cover-game2" class="game-cover">
+                    <h3>射擊遊戲專案</h3>
+                    <p>網頁已準備就緒</p>
+                    <button class="play-btn" onclick="runGame('game2', 'https://y11252090-max.github.io/game-2/ai_studio_code.html')">啟動遊戲程式</button>
+                </div>
+                <iframe id="frame-game2"></iframe>
             </div>
 
             <div id="3d" class="content-card">
-                <div class="glass-panel">
-                    <h2>3D作品：日本風鑰匙圈</h2>
-                    <p>簡介：這是一個利用照片建模技術完成的 3D 作品。</p>
-                    <div class="note-box" onclick="showTip('心得', '這個作品是拍了好幾張照片才做成的，雖然過程挑戰很大，但收穫非常豐富！')">
-                        💡 點擊閱讀：創作心得
-                    </div>
-                    <div id="wrapper-3d" class="game-placeholder">
-                        <p style="margin-bottom:15px; color:#7f8c8d;">點擊按鈕查看 3D 預覽</p>
-                        <button class="load-btn" onclick="loadFrame('3d', 'https://y11252090-max.github.io/3D/')">載入作品網頁</button>
-                    </div>
+                <h2>3D作品：鑰匙圈</h2>
+                <div class="info-box" onclick="pop('創作心得', '這個作品是拍了好幾張照片才做成的，雖然做的沒有很成功，但過程中有很多收穫。')">
+                    💡 點擊展開心得：關於 3D 建模的挑戰...
                 </div>
+                <div id="cover-3d" class="game-cover">
+                    <h3>3D 模型展示</h3>
+                    <p>正在準備展示環境</p>
+                    <button class="play-btn" onclick="runGame('3d', 'https://y11252090-max.github.io/3D/')">啟動 3D 預覽</button>
+                </div>
+                <iframe id="frame-3d"></iframe>
             </div>
 
             <div id="reflection" class="content-card">
-                <div class="glass-panel">
-                    <h2>學習反思與總結</h2>
-                    <ul style="margin: 20px 0; padding-left: 20px; line-height: 2;">
-                        <li>使用 Monster Mash 及 Polycam 製作 3D 物件</li>
-                        <li>使用 Google AI Studio 生成網頁遊戲</li>
-                        <li>使用 GitHub 上傳網頁</li>
-                        <li>使用 Gemini 生成學習成果網站首頁</li>
+                <h2>學習反思與總結</h2>
+                <div style="line-height: 2.5; margin-top:20px;">
+                    <p><b>課程核心內容：</b></p>
+                    <ul>
+                        <li>使用 Monster Mash / Polycam 製作 3D 物件</li>
+                        <li>使用 AI Studio 生成遊戲代碼</li>
+                        <li>使用 GitHub 發布個人網頁</li>
+                        <li>使用 Gemini 優化作品集介面</li>
                     </ul>
-                    <div class="note-box" onclick="showTip('克服挑戰', '我遇到了無法登入 GitHub 與網頁空白的問題，但在老師的指導下，我學會了如何從錯誤中學習並修正！')">
-                        🚩 點擊查看：遇到的困難與成長
-                    </div>
+                </div>
+                <div class="info-box" onclick="pop('遇到的困難', '第一個是無法登入 GitHub，第二個是網址內沒有內容。經過詢問老師後，我學會了如何除錯。')">
+                    🚩 點擊查看：我如何克服困難？
                 </div>
             </div>
         </main>
@@ -239,33 +214,28 @@
     <script>
         AOS.init({ duration: 800 });
 
-        // 切換區塊邏輯
-        function showSection(id) {
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        // 切換分頁
+        function switchTab(id) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             event.currentTarget.classList.add('active');
-
-            document.querySelectorAll('.content-card').forEach(el => el.classList.remove('active'));
-            const target = document.getElementById(id);
-            target.classList.add('active');
+            document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
             AOS.refresh();
         }
 
-        // 動態載入 Iframe（這能解決妳提到的分數問題）
-        function loadFrame(type, url) {
-            const wrapper = document.getElementById('wrapper-' + type);
-            wrapper.innerHTML = `<iframe src="${url}" data-aos="zoom-in"></iframe>`;
-            wrapper.classList.remove('game-placeholder');
-            wrapper.style.height = "auto";
+        // 真正的啟動遊戲邏輯
+        function runGame(id, url) {
+            const cover = document.getElementById('cover-' + id);
+            const frame = document.getElementById('frame-' + id);
+            
+            cover.style.display = 'none'; // 隱藏封面
+            frame.src = url;              // 這時候才去抓網址
+            frame.style.display = 'block'; // 顯示遊戲
         }
 
         // 彈窗
-        function showTip(title, text) {
-            Swal.fire({
-                title: title,
-                text: text,
-                icon: 'info',
-                confirmButtonColor: '#54a0ff'
-            });
+        function pop(title, text) {
+            Swal.fire({ title: title, text: text, icon: 'info', confirmButtonColor: '#6c5ce7' });
         }
     </script>
 </body>
