@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>114-2高三科技應用專題作品集-30902高筱涵</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --sidebar-width: 280px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 上方橫幅 */
+        header {
+            height: 80px;
+            background: white;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: #333;
+            letter-spacing: 1px;
+        }
+
+        /* 主要內容區塊 */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* 左側選單 */
+        nav {
+            width: var(--sidebar-width);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255,255,255,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #555;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* 右側顯示區塊 */
+        main {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .content-card {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .content-card.active {
+            display: block;
+        }
+
+        .glass-panel {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            line-height: 1.8;
+        }
+
+        .btn-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 25px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            transition: 0.3s;
+        }
+
+        .btn-link:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .highlight-box {
+            background: #f0f7ff;
+            border-left: 5px solid var(--primary-color);
+            padding: 20px;
+            margin: 20px 0;
+            cursor: help;
+        }
+
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* 情境引導 */
+        #intro-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #333;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            transition: 1s ease-out;
+        }
+
+        .fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        h2 { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="intro-overlay">
+        <h2 data-aos="zoom-in">歡迎來到筱涵的科技應用之旅</h2>
+        <p data-aos="fade-up" data-aos-delay="500">從 0 到 1，探索程式與 3D 的無限可能...</p>
+        <button onclick="startApp()" style="margin-top: 30px; padding: 12px 30px; cursor: pointer; border:none; border-radius:5px;">進入作品集</button>
+    </div>
+
+    <header>
+        <h1>114-2高三科技應用專題作品集 - 30902 高筱涵</h1>
+    </header>
+
+    <div class="main-container">
+        <nav>
+            <div class="nav-item active" onclick="showContent('welcome')">🏠 首頁引言</div>
+            <div class="nav-item" onclick="showContent('game1')">🎮 俄羅斯方塊</div>
+            <div class="nav-item" onclick="showContent('game2')">🚀 射擊遊戲</div>
+            <div class="nav-item" onclick="showContent('3d')">🎨 3D作品：鑰匙圈</div>
+            <div class="nav-item" onclick="showContent('reflection')">📝 學習反思</div>
+        </nav>
+
+        <main>
+            <div id="welcome" class="content-card active" data-aos="fade-left">
+                <div class="glass-panel">
+                    <h2>探索科技的足跡</h2>
+                    <p>這份作品集記錄了我在 114-2 學期中，利用 AI 工具與 3D 建模技術所創造的成果。請點擊左側選單開始探索。</p>
+                </div>
+            </div>
+
+            <div id="game1" class="content-card" data-aos="fade-left">
+                <div class="glass-panel">
+                    <h2>網頁遊戲：俄羅斯方塊</h2>
+                    <div class="highlight-box" onclick="showAlert('AI Studio 心得', '這項作品是用AI Studio 完成的，我寫了很多關鍵字，希望能做出好玩的遊戲。')">
+                        💡 點擊查看創作心得
+                    </div>
+                    <a href="https://y11252090-max.github.io/game/ai_studio_code.html" target="_blank" class="btn-link">全螢幕遊玩</a>
+                    <iframe src="https://y11252090-max.github.io/game/ai_studio_code.html"></iframe>
+                </div>
+            </div>
+
+            <div id="game2" class="content-card" data-aos="fade-left">
+                <div class="glass-panel">
+                    <h2>網頁遊戲：射擊遊戲</h2>
+                    <div class="highlight-box" onclick="showAlert('創作突破', '這是我的第一次射擊遊戲嘗試！雖然目前還在練習階段，但我希望未來能不斷精進功力。')">
+                        💡 點擊查看創作心得
+                    </div>
+                    <a href="https://y11252090-max.github.io/game-2/ai_studio_code.html" target="_blank" class="btn-link">全螢幕遊玩</a>
+                    <iframe src="https://y11252090-max.github.io/game-2/ai_studio_code.html"></iframe>
+                </div>
+            </div>
+
+            <div id="3d" class="content-card" data-aos="fade-left">
+                <div class="glass-panel">
+                    <h2>3D作品：日本風鑰匙圈</h2>
+                    <p>簡介：這是一個富有日本風格的鑰匙圈設計。</p>
+                    <div class="highlight-box" onclick="showAlert('技術細節', '這個作品是拍了好幾張照片才做成的 3D 作品，雖然過程中有些挑戰，但收穫遠比結果重要。')">
+                        💡 點擊查看創作心得
+                    </div>
+                    <a href="https://y11252090-max.github.io/3D/" target="_blank" class="btn-link">查看 3D 預覽</a>
+                    <iframe src="https://y11252090-max.github.io/3D/"></iframe>
+                </div>
+            </div>
+
+            <div id="reflection" class="content-card" data-aos="fade-left">
+                <div class="glass-panel">
+                    <h2>學習反思與總結</h2>
+                    <p>本課程涵蓋了四個核心技術模組：</p>
+                    <ul>
+                        <li>1. 使用 Monster Mash 及 Polycam 製作 3D 物件</li>
+                        <li>2. 使用 Google AI Studio 生成網頁遊戲</li>
+                        <li>3. 使用 GitHub 上傳與發布網頁</li>
+                        <li>4. 使用 Gemini 生成學習成果網站首頁</li>
+                    </ul>
+                    <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+                    <div class="highlight-box" onclick="showAlert('克服困難', '在製作過程中，我遇到過 GitHub 無法登入、網頁空白等問題。但在老師的指導下，我學會了如何除錯並成功解決問題！')">
+                        🚩 點擊查看遇到的困難與成長
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // 初始化動畫
+        AOS.init({ duration: 800 });
+
+        // 進入網頁
+        function startApp() {
+            document.getElementById('intro-overlay').classList.add('fade-out');
+        }
+
+        // 切換內容
+        function showContent(id) {
+            // 切換選單狀態
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // 切換內容顯示
+            document.querySelectorAll('.content-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            const activeCard = document.getElementById(id);
+            activeCard.classList.add('active');
+            
+            // 重新觸發 AOS 動畫
+            AOS.refresh();
+        }
+
+        // 彈出視窗
+        function showAlert(title, text) {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'info',
+                confirmButtonColor: '#4a90e2',
+                confirmButtonText: '收到了'
+            });
+        }
+    </script>
+</body>
+</html>
