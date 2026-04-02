@@ -9,21 +9,22 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --primary: #4834d4;
-            --secondary: #686de0;
+            --primary: #3498db;
+            --dark-bg: #2c3e50;
             --glass: rgba(255, 255, 255, 0.95);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; }
 
         body {
-            background: #f0f2f5;
+            background: #f4f7f6;
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
+        /* 上方橫幅 */
         header {
             height: 70px;
             background: white;
@@ -34,121 +35,129 @@
             z-index: 100;
         }
 
-        header h1 { font-size: 1.3rem; color: #30336b; border-left: 5px solid var(--primary); padding-left: 15px; }
+        header h1 { font-size: 1.3rem; color: #2c3e50; border-left: 6px solid var(--primary); padding-left: 15px; }
 
         .main-container { display: flex; flex: 1; overflow: hidden; }
 
+        /* 左側選單 */
         nav {
-            width: 260px;
+            width: 250px;
             background: var(--glass);
             padding: 25px 15px;
-            border-right: 1px solid #e1e1e1;
+            border-right: 1px solid #eee;
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
 
         .nav-item {
-            padding: 12px 18px;
-            border-radius: 10px;
+            padding: 14px 20px;
+            border-radius: 12px;
             cursor: pointer;
             transition: 0.3s;
-            color: #535c68;
+            color: #7f8c8d;
             font-weight: 500;
         }
 
-        .nav-item:hover { background: #f1f2f6; color: var(--primary); }
+        .nav-item:hover { background: #f8f9fa; color: var(--primary); }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3); }
 
-        .nav-item.active { background: var(--primary); color: white; }
-
+        /* 右側顯示區塊 */
         main { flex: 1; padding: 40px; overflow-y: auto; background: white; position: relative; }
 
         .content-card { display: none; max-width: 900px; margin: 0 auto; }
         .content-card.active { display: block; }
 
-        /* 遊戲區域容器 */
-        .game-wrapper {
+        /* 遊戲容器 */
+        .game-area {
             position: relative;
             width: 100%;
-            margin-top: 20px;
+            height: 550px;
+            background: #000;
             border-radius: 20px;
+            margin-top: 20px;
             overflow: hidden;
-            background: #2d3436;
-            min-height: 500px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
         }
 
-        /* 封面遮罩 */
-        .game-cover {
+        /* 初始封面：保證不顯示遊戲結束 */
+        .game-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            color: white;
+            transition: 0.4s;
+        }
+
+        .start-btn {
+            padding: 15px 40px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+
+        .start-btn:hover { transform: scale(1.05); background: #2980b9; }
+
+        /* 退出按鈕：點擊後徹底移除遊戲，回到封面 */
+        .exit-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .exit-btn:hover { background: #e74c3c; border-color: #e74c3c; }
+
+        iframe { width: 100%; height: 100%; border: none; }
+
+        .info-box {
+            background: #fcfcfc;
+            border-left: 5px solid var(--primary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        /* 入口遮罩 */
+        #welcome-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark-bg);
+            z-index: 1000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
-            z-index: 10;
-            background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
-            transition: 0.5s;
-        }
-
-        .action-btn {
-            padding: 12px 35px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 15px;
-        }
-
-        .action-btn:hover { background: #3c2bb3; transform: scale(1.05); }
-
-        /* 重置按鈕 (平時隱藏，遊玩時顯示) */
-        .reset-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 8px 15px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 20;
-            display: none;
-            font-size: 0.8rem;
-        }
-
-        .reset-btn:hover { background: rgba(231, 76, 60, 0.8); }
-
-        iframe { width: 100%; height: 550px; border: none; display: none; }
-
-        .info-box {
-            background: #f9f9f9;
-            border-left: 5px solid var(--secondary);
-            padding: 15px 20px;
-            margin: 20px 0;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        #intro-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #130f40; color: white;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 9999; transition: 0.6s;
+            transition: 0.8s;
         }
     </style>
 </head>
 <body>
 
-    <div id="intro-screen">
-        <h2 data-aos="zoom-in">科技應用專題：高筱涵的作品集</h2>
-        <button class="action-btn" onclick="closeIntro()">點擊進入頁面</button>
+    <div id="welcome-overlay">
+        <h2 data-aos="zoom-in">科技應用專題 作品集</h2>
+        <p style="margin: 10px 0 30px; opacity: 0.7;">30902 高筱涵</p>
+        <button class="start-btn" onclick="this.parentElement.style.opacity='0'; setTimeout(()=>this.parentElement.remove(), 800)">點擊進入</button>
     </div>
 
     <header>
@@ -157,75 +166,79 @@
 
     <div class="main-container">
         <nav>
-            <div class="nav-item active" onclick="switchTab('home')">🏠 首頁</div>
+            <div class="nav-item active" onclick="switchTab('home')">🏠 專案首頁</div>
             <div class="nav-item" onclick="switchTab('game1')">🎮 俄羅斯方塊</div>
             <div class="nav-item" onclick="switchTab('game2')">🚀 射擊遊戲</div>
             <div class="nav-item" onclick="switchTab('3d')">🎨 3D作品：鑰匙圈</div>
             <div class="nav-item" onclick="switchTab('reflection')">📝 學習反思</div>
         </nav>
 
-        <main>
-            <div id="home" class="content-card active" data-aos="fade-left">
-                <h2>專案起點</h2>
-                <p style="margin-top:15px; color:#666;">這裡記錄了我這學期在科技應用課的所有心血。包含網頁遊戲開發、3D 建模與 GitHub 雲端部署。請從左側選單選擇你想查看的內容。</p>
+        <main id="content-parent">
+            <div id="home" class="content-card active" data-aos="fade-up">
+                <div class="info-box">
+                    <h2>探索科技的無限可能</h2>
+                    <p style="margin-top:10px;">這是我的高三科技專題成果展。在這裡妳會看到我結合 AI 輔助開發的網頁遊戲，以及透過照片建模生成的 3D 作品。</p>
+                </div>
             </div>
 
             <div id="game1" class="content-card">
-                <h2>作品：俄羅斯方塊</h2>
-                <div class="info-box" onclick="showMsg('心得', '這項作品是用AI Studio 完成的，我寫了很多關鍵字，希望能做出好玩的遊戲。')">
+                <h2>俄羅斯方塊</h2>
+                <div class="info-box" onclick="tip('心得', '這項作品是用AI Studio 完成的，我寫了很多關鍵字，希望能做出好玩的遊戲。')">
                     💡 點擊展開：創作心得
                 </div>
-                <div class="game-wrapper">
-                    <button id="reset-game1" class="reset-btn" onclick="resetGame('game1')">結束遊玩 / 重置</button>
-                    <div id="cover-game1" class="game-cover">
+                <div class="game-area">
+                    <button id="exit-game1" class="exit-btn" onclick="stopGame('game1')">結束遊玩 / 返回封面</button>
+                    <div id="cover-game1" class="game-overlay">
                         <h3>俄羅斯方塊</h3>
-                        <button class="action-btn" onclick="playGame('game1', 'https://y11252090-max.github.io/game/ai_studio_code.html')">開始玩遊戲</button>
+                        <button class="start-btn" onclick="startGame('game1', 'https://y11252090-max.github.io/game/ai_studio_code.html')">開始玩遊戲</button>
                     </div>
-                    <iframe id="frame-game1"></iframe>
+                    <div id="container-game1" style="height:100%;"></div>
                 </div>
             </div>
 
             <div id="game2" class="content-card">
-                <h2>作品：射擊遊戲</h2>
-                <div class="info-box" onclick="showMsg('心得', '這項作品是用AI Studio 完成的，我第一次做射擊遊戲，希望自己以後能提高功力。')">
+                <h2>射擊遊戲</h2>
+                <div class="info-box" onclick="tip('心得', '這項作品是用AI Studio 完成的，我第一次做射擊遊戲，希望自己以後能提高我的功力。')">
                     💡 點擊展開：創作心得
                 </div>
-                <div class="game-wrapper">
-                    <button id="reset-game2" class="reset-btn" onclick="resetGame('game2')">結束遊玩 / 重置</button>
-                    <div id="cover-game2" class="game-cover">
+                <div class="game-area">
+                    <button id="exit-game2" class="exit-btn" onclick="stopGame('game2')">結束遊玩 / 返回封面</button>
+                    <div id="cover-game2" class="game-overlay">
                         <h3>射擊遊戲</h3>
-                        <button class="action-btn" onclick="playGame('game2', 'https://y11252090-max.github.io/game-2/ai_studio_code.html')">開始玩遊戲</button>
+                        <button class="start-btn" onclick="startGame('game2', 'https://y11252090-max.github.io/game-2/ai_studio_code.html')">開始玩遊戲</button>
                     </div>
-                    <iframe id="frame-game2"></iframe>
+                    <div id="container-game2" style="height:100%;"></div>
                 </div>
             </div>
 
             <div id="3d" class="content-card">
                 <h2>3D作品：鑰匙圈</h2>
-                <div class="info-box" onclick="showMsg('心得', '這個作品是拍了好幾張照片才做成的，雖然做的沒有很成功，但過程中有很多收穫。')">
+                <div class="info-box" onclick="tip('心得', '這個作品是拍了好幾張照片才做成的，雖然做得不完美，但過程中收穫很多。')">
                     💡 點擊展開：創作心得
                 </div>
-                <div class="game-wrapper">
-                    <button id="reset-3d" class="reset-btn" onclick="resetGame('3d')">關閉預覽</button>
-                    <div id="cover-3d" class="game-cover">
+                <div class="game-area">
+                    <button id="exit-3d" class="exit-btn" onclick="stopGame('3d')">關閉預覽</button>
+                    <div id="cover-3d" class="game-overlay">
                         <h3>3D 模型展示</h3>
-                        <button class="action-btn" onclick="playGame('3d', 'https://y11252090-max.github.io/3D/')">啟動 3D 視圖</button>
+                        <button class="start-btn" onclick="startGame('3d', 'https://y11252090-max.github.io/3D/')">查看作品</button>
                     </div>
-                    <iframe id="frame-3d"></iframe>
+                    <div id="container-3d" style="height:100%;"></div>
                 </div>
             </div>
 
             <div id="reflection" class="content-card">
                 <h2>學習反思與總結</h2>
-                <p style="margin-top:15px;">本學期技術清單：</p>
-                <ul style="margin: 15px 25px; line-height: 2;">
-                    <li>3D 物件製作 (Monster Mash / Polycam)</li>
-                    <li>AI 網頁生成 (Google AI Studio)</li>
-                    <li>雲端網頁託管 (GitHub Pages)</li>
-                    <li>智慧助手應用 (Gemini)</li>
-                </ul>
-                <div class="info-box" onclick="showMsg('困難與收穫', '遇到無法登入 GitHub 與網頁空白的問題。經過詢問老師找出錯誤，這讓我學會了細心檢查的重要。')">
-                    🚩 點擊查看：成長紀錄
+                <div class="info-box">
+                    <p><b>本課程四大學習重點：</b></p>
+                    <ul style="margin: 10px 20px;">
+                        <li>3D 建模 (Monster Mash, Polycam)</li>
+                        <li>AI 生成網頁遊戲 (AI Studio)</li>
+                        <li>GitHub Pages 託管技術</li>
+                        <li>Gemini AI 網頁架構優化</li>
+                    </ul>
+                </div>
+                <div class="info-box" onclick="tip('克服困難', '在過程中遇到無法登入 GitHub 與網頁空白的問題，經老師指導後順利排除錯誤。')">
+                    🚩 點擊查看：困難克服紀錄
                 </div>
             </div>
         </main>
@@ -235,14 +248,10 @@
     <script>
         AOS.init({ duration: 800 });
 
-        function closeIntro() {
-            const screen = document.getElementById('intro-screen');
-            screen.style.opacity = '0';
-            setTimeout(() => screen.style.display = 'none', 600);
-        }
-
-        // 切換分頁邏輯
         function switchTab(id) {
+            // 切換時，先停止所有正在執行的遊戲（防止切換後背景仍出現遊戲結束）
+            stopAllGames();
+
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             event.currentTarget.classList.add('active');
             document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
@@ -250,33 +259,43 @@
             AOS.refresh();
         }
 
-        // 開始玩遊戲：載入 iframe 並隱藏封面
-        function playGame(id, url) {
-            const frame = document.getElementById('frame-' + id);
+        // 啟動遊戲：動態「創建」iframe
+        function startGame(id, url) {
+            const container = document.getElementById('container-' + id);
             const cover = document.getElementById('cover-' + id);
-            const resetBtn = document.getElementById('reset-' + id);
+            const exitBtn = document.getElementById('exit-' + id);
 
-            frame.src = url;
-            frame.style.display = 'block';
-            cover.style.display = 'none';
-            resetBtn.style.display = 'block';
+            // 只有點擊時才把 iframe 塞進去網頁，保證從頭開始
+            container.innerHTML = `<iframe src="${url}"></iframe>`;
+            cover.style.opacity = '0';
+            setTimeout(()=> { cover.style.display = 'none'; }, 400);
+            exitBtn.style.display = 'block';
         }
 
-        // 重置遊戲：清空 iframe 並顯封面 (解決一直看到遊戲結束的問題)
-        function resetGame(id) {
-            const frame = document.getElementById('frame-' + id);
+        // 停止遊戲：徹底「刪除」iframe，清除所有遊戲進度與畫面
+        function stopGame(id) {
+            const container = document.getElementById('container-' + id);
             const cover = document.getElementById('cover-' + id);
-            const resetBtn = document.getElementById('reset-' + id);
+            const exitBtn = document.getElementById('exit-' + id);
 
-            frame.src = ""; // 清空網址，徹底停止遊戲邏輯
-            frame.style.display = 'none';
+            container.innerHTML = ""; // 關鍵：刪除 iframe 內容
             cover.style.display = 'flex';
-            resetBtn.style.display = 'none';
+            setTimeout(()=> { cover.style.opacity = '1'; }, 10);
+            exitBtn.style.display = 'none';
         }
 
-        function showMsg(title, text) {
-            Swal.fire({ title: title, text: text, icon: 'info', confirmButtonColor: '#4834d4' });
+        function stopAllGames() {
+            ['game1', 'game2', '3d'].forEach(id => {
+                const container = document.getElementById('container-' + id);
+                if(container && container.innerHTML !== "") {
+                    stopGame(id);
+                }
+            });
+        }
+
+        function tip(title, text) {
+            Swal.fire({ title: title, text: text, icon: 'info', confirmButtonColor: '#3498db' });
         }
     </script>
 </body>
-</html>
+</html>     
